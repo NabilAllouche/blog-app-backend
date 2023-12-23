@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 
 // connect to database
-// connectDB();
+connectDB();
 
 // Middleware
 app.use(express.json()); // Parse JSON requests
@@ -20,5 +20,5 @@ app.use(cookieParser()); // Parse cookies
 app.use("/v1", apiRouter);
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}/v1/example`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
