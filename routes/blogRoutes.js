@@ -9,16 +9,18 @@ import {
   getBlogById,
 } from "../controllers/blogControllers.js";
 
+import { authMiddleware } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
 // create blog
-router.post("/", createBlog);
+router.post("/", authMiddleware, createBlog);
 
 // edit blog
-router.put("/:blogId", editBlog);
+router.put("/:blogId", authMiddleware, editBlog);
 
 // delete blog
-router.delete("/:blogId", deleteBlog);
+router.delete("/:blogId", authMiddleware, deleteBlog);
 
 // get all blogs
 router.get("/allBlogs", getAllBlog);
@@ -30,6 +32,6 @@ router.get("/BlogById/:blogId", getBlogById);
 router.get("/blogsByCategory/:categoryId", getBlogByCategoryId);
 
 // get blogger's blog
-router.get("/blogsByBloggerId/:bloggerId", getBlogsByBloggerId);
+router.get("/blogsByBloggerId/:bloggerId", authMiddleware, getBlogsByBloggerId);
 
 export default router;
