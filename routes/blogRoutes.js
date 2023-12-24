@@ -7,7 +7,7 @@ import {
   getBlogByCategoryId,
   getBlogsByBloggerId,
   getBlogById,
-} from "../controllers/BlogControllers.js";
+} from "../controllers/blogControllers.js";
 
 const router = express.Router();
 
