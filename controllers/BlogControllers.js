@@ -1,9 +1,13 @@
+import { upload } from "../helpers/firebase_upload.js";
 import Blog from "../models/Blog.js";
 
 // create blog
 export const createBlog = async (req, res) => {
   try {
+    const url = await upload(req);
+    req.body.picture = url;
     const newBlog = new Blog(req.body);
+    console.log(newBlog);
     await Blog.create(newBlog);
     return res
       .status(200)
@@ -68,8 +72,8 @@ export const getAllBlog = async (req, res) => {
           createdAt: 1,
           updatedAt: 1,
           bloggerFirstName: "$blogger.firstName",
-          bloggerFirstName: "$blogger.lastName",
-          bloggerFirstName: "$blogger.image",
+          bloggerLastName: "$blogger.lastName",
+          bloggerImage: "$blogger.image",
         },
       },
     ]);

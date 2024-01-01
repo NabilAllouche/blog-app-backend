@@ -8,13 +8,14 @@ import {
   getBlogsByBloggerId,
   getBlogById,
 } from "../controllers/blogControllers.js";
+import { upload } from "../config/firebase.js";
 
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // create blog
-router.post("/", authMiddleware, createBlog);
+router.post("/", upload.single("filename"), createBlog);
 
 // edit blog
 router.put("/:blogId", authMiddleware, editBlog);
