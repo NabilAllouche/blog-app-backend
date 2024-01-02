@@ -1,11 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Blogger from "../models/Blogger.js";
+import { upload } from "../helpers/firebase_upload.js";
 
 // blogger registre
 export const bloggerRegistre = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, image } = req.body;
+    const { firstName, lastName, email, password } = req.body;
     const blogger = await Blogger.findOne({ email });
 
     if (blogger) {
@@ -13,19 +14,21 @@ export const bloggerRegistre = async (req, res) => {
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
+    const url = await upload(req);
 
     const newBlogger = new Blogger({
       firstName,
       lastName,
       email,
       password: hashedPassword,
-      image,
+      image: url,
     });
     const bloggerData = await newBlogger.save();
+    console.log(process.env.JWT_EXPERATION);
     const token = jwt.sign(
       { BloggerId: bloggerData._id },
       process.env.JWT_SECRET,
-      process.env.JWT_EXPERATION
+      { expiresIn: process.env.JWT_EXPIRATION }
     );
     res.cookie("token", token, { httpOnly: true });
 
@@ -47,21 +50,22 @@ export const bloggerLogin = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isPassword = bcrypt.compare(password, blogger.password);
+    const isPassword = await bcrypt.compare(password, blogger.password);
+    console.log(isPassword);
 
     if (!isPassword) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { BloggerId: bloggerData._id },
-      process.env.JWT_SECRET,
-      process.env.JWT_EXPERATION
-    );
+    const token = jwt.sign({ BloggerId: blogger._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRATION,
+    });
     res.cookie("token", token, { httpOnly: true });
 
-    return res.status(201).send({ bloggerData: bloggerData, token: token });
-  } catch (e) {
+    return res
+      .status(201)
+      .send({ message: `welcome back ${blogger.firstName} ` });
+  } catch (error) {
     console.log(error);
     return res.status(500).send({ error: error.message });
   }

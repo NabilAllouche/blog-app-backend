@@ -53,6 +53,15 @@ export const deleteBlog = async (req, res) => {
 // get all blogs
 export const getAllBlog = async (req, res) => {
   try {
+    // Pagination
+    const page = parseInt(req.query.page) || 1;
+    console.log(page);
+    const limit = parseInt(req.query.limit) || 1;
+    // Calculate the skip value
+    const skip = (page - 1) * limit;
+    console.log(skip);
+    console.log("getAllBlog");
+    const total = await Blog.countDocuments();
     const blogs = await Blog.aggregate([
       {
         $lookup: {
@@ -62,12 +71,15 @@ export const getAllBlog = async (req, res) => {
           as: "blogger",
         },
       },
+      {
+        $unwind: "$blogger",
+      },
 
       {
         $project: {
-          _id: 1,
+          id: "$_id",
           title: 1,
-          image: 1,
+          picture: 1,
           content: 1,
           createdAt: 1,
           updatedAt: 1,
@@ -76,13 +88,19 @@ export const getAllBlog = async (req, res) => {
           bloggerImage: "$blogger.image",
         },
       },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
     ]);
-    res.status(200).send(blogs);
+    res.status(200).send({ data: blogs, total: total });
   } catch (error) {
     console.log(error);
     return res
       .status(500)
-      .send({ message: "internal error at deleteBlog", error });
+      .send({ message: "internal error at getAllBlog", error });
   }
 };
 
