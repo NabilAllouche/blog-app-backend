@@ -12,7 +12,7 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "http://localhost:5174",
-    "https://nabil-blog-app-backend.onrender.com",
+    "https://nabil-blog-app.netlify.app/",
   ],
   credentials: true,
 };
